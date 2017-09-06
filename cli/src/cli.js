@@ -7,6 +7,7 @@ export const cli = vorpal()
 
 let username
 let server
+let previousMessageCommand
 
 cli
   .delimiter(cli.chalk['yellow']('ftd~$'))
@@ -32,30 +33,63 @@ cli
     })
   })
   .action(function (input, callback) {
-    const [ command, ...rest ] = words(input)
-    const contents = rest.join(' ')
+    const [ command, ...rest ] = input.split(' ')
+    let contents = rest.join(' ')
+
+    
+    /*this.log('Command: ' + command)
+    this.log('Rest: ' + rest)
+    this.log('Contents: ' + contents)*/
 
     const commands = {
       'disconnect' : 'disconnect from server',
       'echo' : 'repeat message back',
+      'users' : 'get list of users connected to server',
       'broadcast' : 'send message to all users',
+      '@<username>' : 'send a mess directly to a user',
+      '<message>' : 'send message with previously used message command',
       'help' : 'print all commands'
+      
     }
 
-    if (command === 'disconnect') {
-      server.end(new Message({ username, command }).toJSON() + '\n')
-    } else if (command === 'echo') {
-      server.write(new Message({ username, command, contents }).toJSON() + '\n')
-    } else if (command === 'broadcast') {
-      server.write(new Message({ username, command, contents }).toJSON() + '\n')
-    } else if (command === 'help') {
-      for (let prop in commands)
-      {
-        this.log(prop + '\t\t' + commands[prop])
+    const evaluateCommand = (command) => {
+      if (command === 'disconnect') {
+        previousMessageCommand = null
+        server.end(new Message({ username, command }).toJSON() + '\n')
+      } else if (command === 'echo') {
+        previousMessageCommand = command
+        server.write(new Message({ username, command, contents }).toJSON() + '\n')
+      } else if (command === 'users') {
+        server.write(new Message({ username, command, contents }).toJSON() + '\n')
+      } else if (command === 'broadcast') {
+        previousMessageCommand = command
+        server.write(new Message({ username, command, contents }).toJSON() + '\n')
+      } else if (String(command).startsWith('@') === true) {
+        previousMessageCommand = command
+        server.write(new Message({ username, command, contents }).toJSON() + '\n')
+      } else if (command === 'help') {
+        for (let prop in commands)
+        {
+          this.log(prop + '\t\t' + commands[prop])
+        }
+      } else {
+        if (previousMessageCommand)
+        {
+          contents = command + ' ' + contents
+          evaluateCommand(previousMessageCommand)
+        }
+        else
+        {
+          this.log(`Command <${command}> was not recognized`)
+        }
       }
-    } else {
-      this.log(`Command <${command}> was not recognized`)
+
     }
+
+    evaluateCommand(command);
+
+    
 
     callback()
   })
+

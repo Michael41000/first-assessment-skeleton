@@ -38,42 +38,54 @@ public class ClientHandler implements Runnable {
 				String raw = reader.readLine();
 				Message message = mapper.readValue(raw, Message.class);
 
-				switch (message.getCommand()) {
-					case "connect":
-						// Nobody with duplicate username
-						if (users.addUser(message.getUsername(), mySocket) == true)
-						{
-							log.info("user <{}> connected", message.getUsername());
-						}
-						else
-						{
-							log.info("user <{}> denied, duplicate username", message.getUsername());
-							message.setContents("Denied due to duplicate username.");
-							String response = mapper.writeValueAsString(message);
-							writer.write(response);
-							writer.flush();
-							this.mySocket.close();
-						}
-						break;
-					case "disconnect":
-						log.info("user <{}> disconnected", message.getUsername());
-						this.mySocket.close();
-						users.removeUser(message.getUsername());
-						break;
-					case "echo":
-						log.info("user <{}> echoed message <{}>", message.getUsername(), message.getContents());
-						
+				if (message.getCommand().equals("connect"))
+				{
+					// Nobody with duplicate username
+					if (users.addUser(message.getUsername(), mySocket) == true)
+					{
+						log.info("user <{}> connected", message.getUsername());
+					}
+					else
+					{
+						log.info("user <{}> denied, duplicate username", message.getUsername());
+						message.setContents("Denied due to duplicate username.");
 						String response = mapper.writeValueAsString(message);
-						System.out.println("\n\t" + response);
 						writer.write(response);
 						writer.flush();
-						break;
-					case "broadcast":
-						log.info("user <{}> broadcast message <{}>", message.getUsername(), message.getContents());
-						users.broadcastMessage(message);
-						break;
-						
+						this.mySocket.close();
+					}
 				}
+				else if (message.getCommand().equals("disconnect"))
+				{
+					log.info("user <{}> disconnected", message.getUsername());
+					this.mySocket.close();
+					users.removeUser(message.getUsername());
+				}
+				else if (message.getCommand().equals("echo"))
+				{
+					log.info("user <{}> echoed message <{}>", message.getUsername(), message.getContents());
+					String response = mapper.writeValueAsString(message);
+					writer.write(response);
+					writer.flush();
+				}
+				else if (message.getCommand().equals("broadcast"))
+				{
+					log.info("user <{}> broadcast message <{}>", message.getUsername(), message.getContents());
+					users.broadcastMessage(message);
+				}
+				else if (message.getCommand().startsWith("@"))
+				{
+					log.info("user <{}> @ message <{}> to <{}>", message.getUsername(), message.getContents(), message.getCommand().substring(1));
+					users.directMessage(message);
+				}
+				else if (message.getCommand().equals("users"))
+				{
+					log.info("users <{}> got list of users", message.getUsername());
+					users.getUsers(message);
+				}
+				
+						
+				
 			}
 
 		} catch (IOException e) {
