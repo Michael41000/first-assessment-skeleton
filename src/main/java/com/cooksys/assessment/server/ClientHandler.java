@@ -44,6 +44,8 @@ public class ClientHandler implements Runnable {
 					if (users.addUser(message.getUsername(), mySocket) == true)
 					{
 						log.info("user <{}> connected", message.getUsername());
+						message.setContents("ALERT: " + message.getUsername() + " has connected");
+						users.broadcastMessage(message);
 					}
 					else
 					{
