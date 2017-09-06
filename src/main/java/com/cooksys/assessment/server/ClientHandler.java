@@ -60,6 +60,8 @@ public class ClientHandler implements Runnable {
 				else if (message.getCommand().equals("disconnect"))
 				{
 					log.info("user <{}> disconnected", message.getUsername());
+					message.setContents("ALERT: " + message.getUsername() + " has disconnected");
+					users.broadcastMessage(message);
 					this.mySocket.close();
 					users.removeUser(message.getUsername());
 				}
