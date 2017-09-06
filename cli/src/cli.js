@@ -39,6 +39,14 @@ cli
       {
         this.log(message.timestamp + ' ' + message.username + ' ' + '(echo): ' + message.contents)
       }
+      else if (message.command === 'broadcast')
+      {
+        this.log(message.timestamp + ' ' + message.username + ' ' + '(all): ' + message.contents)
+      }
+      else if (String(message.command).startsWith('@') === true)
+      {
+        this.log(message.timestamp + ' ' + message.username + ' ' + '(whisper): ' + message.contents)
+      }
       // Just placeholder till everything works
       else {
         this.log(Message.fromJSON(buffer).toString())
@@ -92,7 +100,7 @@ cli
       } else {
         if (previousMessageCommand)
         {
-          contents = command + ' ' + contents
+          contents = (command + ' ' + contents).trim()
           evaluateCommand(previousMessageCommand)
         }
         else
