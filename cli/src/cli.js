@@ -29,11 +29,11 @@ cli
       const message = Message.fromJSON(buffer)
       if (message.command === 'connect')
       {
-        this.log(message.timestamp + ': ' + message.username + ' has connected')
+        this.log(cli.chalk['green'](message.timestamp + ': ' + message.username + ' has connected'))
       }
       else if (message.command === 'disconnect')
       {
-        this.log(message.timestamp + ': ' + message.username + ' has disconnected')
+        this.log(cli.chalk['green'](message.timestamp + ': ' + message.username + ' has disconnected'))
       }
       else if (message.command === 'echo')
       {
@@ -41,15 +41,15 @@ cli
       }
       else if (message.command === 'broadcast')
       {
-        this.log(message.timestamp + ' ' + message.username + ' ' + '(all): ' + message.contents)
+        this.log(cli.chalk['yellow'](message.timestamp + ' ' + message.username + ' ' + '(all): ' + message.contents))
       }
       else if (String(message.command).startsWith('@') === true)
       {
-        this.log(message.timestamp + ' ' + message.username + ' ' + '(whisper): ' + message.contents)
+        this.log(cli.chalk['blue'](message.timestamp + ' ' + message.username + ' ' + '(whisper): ' + message.contents))
       }
       else if (message.command === 'users')
       {
-        this.log(message.timestamp + ': ' + 'currently connected users:' + message.contents)
+        this.log(cli.chalk['magenta'](message.timestamp + ': ' + 'currently connected users:' + message.contents))
       }
       // Just placeholder till everything works
       else {
