@@ -12,11 +12,16 @@ cli
   .delimiter(cli.chalk['yellow']('ftd~$'))
 
 cli
-  .mode('connect <username> <host> <port>')
+  .mode('connect <username> [host] [port]')
   .delimiter(cli.chalk['green']('connected>'))
   .init(function (args, callback) {
     username = args.username
-    server = connect({ host: args.host, port: args.port }, () => {
+    const argsHost = args.host !== undefined ? args.host : 'localhost'
+    let argsPort = args.port !== undefined ? args.port : 8080
+    
+    
+    
+    server = connect({ host: argsHost, port: argsPort }, () => {
       server.write(new Message({ username, command: 'connect' }).toJSON() + '\n')
       callback()
     })
@@ -36,12 +41,15 @@ cli
     const commands = {
       'disconnect' : 'disconnect from server',
       'echo' : 'repeat message back',
+      'broadcast' : 'send message to all users',
       'help' : 'print all commands'
     }
 
     if (command === 'disconnect') {
       server.end(new Message({ username, command }).toJSON() + '\n')
     } else if (command === 'echo') {
+      server.write(new Message({ username, command, contents }).toJSON() + '\n')
+    } else if (command === 'broadcast') {
       server.write(new Message({ username, command, contents }).toJSON() + '\n')
     } else if (command === 'help') {
       for (let prop in commands)
