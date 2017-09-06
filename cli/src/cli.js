@@ -27,7 +27,6 @@ cli
 
     server.on('data', (buffer) => {
       const message = Message.fromJSON(buffer)
-      this.log(message.command)
       if (message.command === 'connect')
       {
         this.log(message.timestamp + ': ' + message.username + ' has connected')
@@ -35,6 +34,10 @@ cli
       else if (message.command === 'disconnect')
       {
         this.log(message.timestamp + ': ' + message.username + ' has disconnected')
+      }
+      else if (message.command === 'echo')
+      {
+        this.log(message.timestamp + ' ' + message.username + ' ' + '(echo): ' + message.contents)
       }
       // Just placeholder till everything works
       else {
