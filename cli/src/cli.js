@@ -17,12 +17,9 @@ cli
   .init(function (args, callback) {
     username = args.username
     const argsHost = args.host !== undefined ? args.host : 'localhost'
-    let argsPort = args.port !== undefined ? args.port : 8080
-    
-    
-    
+    const argsPort = args.port !== undefined ? args.port : 8080
     server = connect({ host: argsHost, port: argsPort }, () => {
-      server.write(new Message({ username, command: 'connect' }).toJSON() + '\n')
+      server.write(new Message({ username, command: 'connect'}).toJSON() + '\n')
       callback()
     })
 
