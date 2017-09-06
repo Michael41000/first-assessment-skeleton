@@ -47,6 +47,10 @@ cli
       {
         this.log(message.timestamp + ' ' + message.username + ' ' + '(whisper): ' + message.contents)
       }
+      else if (message.command === 'users')
+      {
+        this.log(message.timestamp + ': ' + 'currently connected users:' + message.contents)
+      }
       // Just placeholder till everything works
       else {
         this.log(Message.fromJSON(buffer).toString())
@@ -85,7 +89,7 @@ cli
         previousMessageCommand = command
         server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (command === 'users') {
-        server.write(new Message({ username, command, contents }).toJSON() + '\n')
+        server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (command === 'broadcast') {
         previousMessageCommand = command
         server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')

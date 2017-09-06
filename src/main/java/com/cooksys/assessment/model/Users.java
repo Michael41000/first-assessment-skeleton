@@ -102,8 +102,8 @@ public class Users {
 		StringBuilder builder = new StringBuilder();
 		for (String s : userListNames)
 		{
-			builder.append(s);
 			builder.append("\n");
+			builder.append(s);
 		}
 		String userListMessage = builder.toString();
 		message.setContents(userListMessage);
