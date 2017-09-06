@@ -12,11 +12,11 @@ cli
   .delimiter(cli.chalk['yellow']('ftd~$'))
 
 cli
-  .mode('connect <username>')
+  .mode('connect <username> <host> <port>')
   .delimiter(cli.chalk['green']('connected>'))
   .init(function (args, callback) {
     username = args.username
-    server = connect({ host: 'localhost', port: 8080 }, () => {
+    server = connect({ host: args.host, port: args.port }, () => {
       server.write(new Message({ username, command: 'connect' }).toJSON() + '\n')
       callback()
     })
@@ -33,10 +33,21 @@ cli
     const [ command, ...rest ] = words(input)
     const contents = rest.join(' ')
 
+    const commands = {
+      'disconnect' : 'disconnect from server',
+      'echo' : 'repeat message back',
+      'help' : 'print all commands'
+    }
+
     if (command === 'disconnect') {
       server.end(new Message({ username, command }).toJSON() + '\n')
     } else if (command === 'echo') {
       server.write(new Message({ username, command, contents }).toJSON() + '\n')
+    } else if (command === 'help') {
+      for (let prop in commands)
+      {
+        this.log(prop + '\t\t' + commands[prop])
+      }
     } else {
       this.log(`Command <${command}> was not recognized`)
     }
