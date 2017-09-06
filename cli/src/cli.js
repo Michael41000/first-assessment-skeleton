@@ -19,13 +19,27 @@ cli
     username = args.username
     const argsHost = args.host !== undefined ? args.host : 'localhost'
     const argsPort = args.port !== undefined ? args.port : 8080
+    const timestamp = new Date().toString()
     server = connect({ host: argsHost, port: argsPort }, () => {
-      server.write(new Message({ username, command: 'connect'}).toJSON() + '\n')
+      server.write(new Message({ username, command: 'connect', undefined, timestamp}).toJSON() + '\n')
       callback()
     })
 
     server.on('data', (buffer) => {
-      this.log(Message.fromJSON(buffer).toString())
+      const message = Message.fromJSON(buffer)
+      this.log(message.command)
+      if (message.command === 'connect')
+      {
+        this.log(message.timestamp + ': ' + message.username + ' has connected')
+      }
+      else if (message.command === 'disconnect')
+      {
+        this.log(message.timestamp + ': ' + message.username + ' has disconnected')
+      }
+      // Just placeholder till everything works
+      else {
+        this.log(Message.fromJSON(buffer).toString())
+      }
     })
 
     server.on('end', () => {
@@ -35,7 +49,7 @@ cli
   .action(function (input, callback) {
     const [ command, ...rest ] = input.split(' ')
     let contents = rest.join(' ')
-
+    const timestamp = new Date().toString()
     
     /*this.log('Command: ' + command)
     this.log('Rest: ' + rest)
@@ -55,18 +69,18 @@ cli
     const evaluateCommand = (command) => {
       if (command === 'disconnect') {
         previousMessageCommand = null
-        server.end(new Message({ username, command }).toJSON() + '\n')
+        server.end(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (command === 'echo') {
         previousMessageCommand = command
-        server.write(new Message({ username, command, contents }).toJSON() + '\n')
+        server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (command === 'users') {
         server.write(new Message({ username, command, contents }).toJSON() + '\n')
       } else if (command === 'broadcast') {
         previousMessageCommand = command
-        server.write(new Message({ username, command, contents }).toJSON() + '\n')
+        server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (String(command).startsWith('@') === true) {
         previousMessageCommand = command
-        server.write(new Message({ username, command, contents }).toJSON() + '\n')
+        server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (command === 'help') {
         for (let prop in commands)
         {
