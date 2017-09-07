@@ -123,7 +123,9 @@ public class Users {
 		for (String s : userListNames)
 		{
 			builder.append("\n");
+			builder.append("'<");
 			builder.append(s);
+			builder.append(">'");
 		}
 		String userListMessage = builder.toString();
 		message.setContents(userListMessage);
