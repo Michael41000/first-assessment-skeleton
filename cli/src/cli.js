@@ -51,6 +51,7 @@ cli
 
 cli
   .mode('connect <username> [host] [port]')
+  .description('Connects to a server with given host and port')
   .delimiter(cli.chalk['green']('connected>'))
   .init(function (args, callback) {
     username = args.username
@@ -68,39 +69,39 @@ cli
       {
         if (message.error === true)
         {
-          this.log(cli.chalk['green']('\'' + message.timestamp + ': ' + message.contents + '\''))
+          this.log(cli.chalk['green']('`' + message.timestamp + ': ' + message.contents + '`'))
         }
         else
         {
-          this.log(cli.chalk['green']('\'' + message.timestamp + ': <' + message.username + '> has connected\''))
+          this.log(cli.chalk['green']('`' + message.timestamp + ': <' + message.username + '> has connected`'))
         }
       }
       else if (message.command === 'disconnect')
       {
-        this.log(cli.chalk['green']('\'' + message.timestamp + ': <' + message.username + '> has disconnected\''))
+        this.log(cli.chalk['green']('`' + message.timestamp + ': <' + message.username + '> has disconnected`'))
       }
       else if (message.command === 'echo')
       {
-        this.log('\'' + message.timestamp + ' <' + message.username + '> ' + '(echo): ' + message.contents + '\'')
+        this.log('`' + message.timestamp + ' <' + message.username + '> ' + '(echo): ' + message.contents + '`')
       }
       else if (message.command === 'broadcast')
       {
-        this.log(cli.chalk['yellow']('\'' + message.timestamp + ' <' + message.username + '> ' + '(all): ' + message.contents + '\''))
+        this.log(cli.chalk['yellow']('`' + message.timestamp + ' <' + message.username + '> ' + '(all): ' + message.contents + '`'))
       }
       else if (String(message.command).startsWith('@') === true)
       {
         if (message.error === true)
         {
-          this.log(cli.chalk['blue']('\'' + message.timestamp + ': ' + message.contents + '\''))
+          this.log(cli.chalk['blue']('`' + message.timestamp + ': ' + message.contents + '`'))
         }
         else
         {
-          this.log(cli.chalk['blue']('\'' + message.timestamp + ' <' + message.username + '> ' + '(whisper): ' + message.contents + '\''))
+          this.log(cli.chalk['blue']('`' + message.timestamp + ' <' + message.username + '> ' + '(whisper): ' + message.contents + '`'))
         }
       }
       else if (message.command === 'users')
       {
-        this.log(cli.chalk['magenta']('\'' + message.timestamp + ': ' + 'currently connected users:\'' + message.contents))
+        this.log(cli.chalk['magenta']('`' + message.timestamp + ': ' + 'currently connected users:`' + message.contents))
       }
     })
 
@@ -115,10 +116,10 @@ cli
 
     const commands = {
       'disconnect' : 'disconnect from server',
-      'echo' : 'repeat message back',
+      'echo <message>' : 'repeat message back',
       'users' : 'get list of users connected to server',
-      'broadcast' : 'send message to all users',
-      '@<username>' : 'send a mess directly to a user',
+      'broadcast <message>' : 'send message to all users',
+      '@<username> <message>' : 'send a mess directly to a user',
       '<message>' : 'send message with previously used message command',
       'help' : 'print all commands'
       
@@ -132,21 +133,21 @@ cli
         previousCommand = command
         server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (command === 'users') {
-        previousCommand = command
         server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (command === 'broadcast') {
-        previouseCommand = command
+        previousCommand = command
         server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (String(command).startsWith('@') === true) {
         previousCommand = command
         server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (command === 'help') {
-        previousCommand = command
+        this.log('\n  Commands:\n')
         for (let prop in commands)
         {
           const padding = ' '.repeat(20)
-          this.log((prop + padding).slice(0, 20) + '\t' + commands[prop])
+          this.log('    ' + (prop + padding).slice(0, 20) + '\t' + commands[prop])
         }
+        this.log()
       } else {
         if (previousCommand)
         {
@@ -155,7 +156,8 @@ cli
         }
         else
         {
-          this.log(`Command <${command}> was not recognized`)
+          this.log(`\n  Invalid Command. Showing Help:`)
+          evaluateCommand('help')
         }
       }
 
@@ -167,4 +169,6 @@ cli
 
     callback()
   })
+
+
 
