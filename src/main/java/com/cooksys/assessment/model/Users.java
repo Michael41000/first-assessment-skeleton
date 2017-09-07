@@ -79,6 +79,7 @@ public class Users {
 		if (!users.containsKey(message.getCommand().substring(1)))
 		{
 			message.setContents("No user with username: " + username);
+			message.setError(true);
 			username = message.getUsername();
 		}
 		

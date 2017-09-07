@@ -89,7 +89,14 @@ cli
       }
       else if (String(message.command).startsWith('@') === true)
       {
-        this.log(cli.chalk['blue'](message.timestamp + ' ' + message.username + ' ' + '(whisper): ' + message.contents))
+        if (message.error === true)
+        {
+          this.log(cli.chalk['blue'](message.timestamp + ': ' + message.contents))
+        }
+        else
+        {
+          this.log(cli.chalk['blue'](message.timestamp + ' ' + message.username + ' ' + '(whisper): ' + message.contents))
+        }
       }
       else if (message.command === 'users')
       {
