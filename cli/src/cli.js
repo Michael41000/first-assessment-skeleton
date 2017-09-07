@@ -7,7 +7,7 @@ export const cli = vorpal()
 
 let username
 let server
-let previousMessageCommand
+let previousCommand
 
 const generateTimeStamp = () => {
   const d = new Date()
@@ -108,7 +108,7 @@ cli
       cli.exec('exit')
     })
   })
-  .action(function (input, callback) {
+  .action(function (input = undefined, callback) {
     const [ command, ...rest ] = input.split(' ')
     let contents = rest.join(' ')
     const timestamp = generateTimeStamp()
@@ -126,29 +126,32 @@ cli
 
     const evaluateCommand = (command) => {
       if (command === 'disconnect') {
-        previousMessageCommand = null
+        previousCommand = null
         server.end(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (command === 'echo') {
-        previousMessageCommand = command
+        previousCommand = command
         server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (command === 'users') {
+        previousCommand = command
         server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (command === 'broadcast') {
-        previousMessageCommand = command
+        previouseCommand = command
         server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (String(command).startsWith('@') === true) {
-        previousMessageCommand = command
+        previousCommand = command
         server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (command === 'help') {
+        previousCommand = command
         for (let prop in commands)
         {
-          this.log(prop + '\t\t' + commands[prop])
+          const padding = ' '.repeat(20)
+          this.log((prop + padding).slice(0, 20) + '\t' + commands[prop])
         }
       } else {
-        if (previousMessageCommand)
+        if (previousCommand)
         {
           contents = (command + ' ' + contents).trim()
-          evaluateCommand(previousMessageCommand)
+          evaluateCommand(previousCommand)
         }
         else
         {
