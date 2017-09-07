@@ -66,7 +66,14 @@ cli
       const message = Message.fromJSON(buffer)
       if (message.command === 'connect')
       {
-        this.log(cli.chalk['green'](message.timestamp + ': ' + message.username + ' has connected'))
+        if (message.error === true)
+        {
+          this.log(cli.chalk['green'](message.timestamp + ': ' + message.contents))
+        }
+        else
+        {
+          this.log(cli.chalk['green'](message.timestamp + ': ' + message.username + ' has connected'))
+        }
       }
       else if (message.command === 'disconnect')
       {

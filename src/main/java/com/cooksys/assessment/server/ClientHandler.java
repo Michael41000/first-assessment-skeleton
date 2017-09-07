@@ -41,8 +41,9 @@ public class ClientHandler implements Runnable {
 				if (message.getCommand().equals("connect"))
 				{
 					// Nobody with duplicate username
-					if (users.addUser(message.getUsername(), mySocket) == true)
+					if (!users.contains(message.getUsername()))	
 					{
+						users.addUser(message.getUsername(), mySocket);
 						log.info("user <{}> connected", message.getUsername());
 						users.broadcastMessage(message);
 					}
@@ -50,6 +51,7 @@ public class ClientHandler implements Runnable {
 					{
 						log.info("user <{}> denied, duplicate username", message.getUsername());
 						message.setContents("Denied due to duplicate username.");
+						message.setError(true);
 						String response = mapper.writeValueAsString(message);
 						writer.write(response);
 						writer.flush();

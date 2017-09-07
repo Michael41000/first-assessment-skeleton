@@ -47,6 +47,10 @@ public class Users {
 			return false;
 		}
 	}
+	public boolean contains(String username)
+	{
+		return users.containsKey(username);
+	}
 	
 	public void broadcastMessage(Message message)
 	{

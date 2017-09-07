@@ -6,6 +6,7 @@ public class Message {
 	private String command;
 	private String contents;
 	private String timestamp;
+	private boolean error;
 
 	public String getUsername() {
 		return username;
@@ -38,6 +39,16 @@ public class Message {
 	public void setTimestamp(String timestamp) {
 		this.timestamp = timestamp;
 	}
+
+	public boolean isError() {
+		return error;
+	}
+
+	public void setError(boolean error) {
+		this.error = error;
+	}
+	
+	
 	
 	
 
