@@ -9,6 +9,43 @@ let username
 let server
 let previousMessageCommand
 
+const generateTimeStamp = () => {
+  const d = new Date()
+  const dString = d.toString().split(' ')
+  const dayWord = dString[0]
+  const month = d.getMonth() + 1
+  const day = d.getDate()
+  const year = d.getFullYear()
+  let hour = d.getHours()
+  let night
+  if (hour === 12)
+  {
+    night = true
+  }
+  else if (hour < 12)
+  {
+    night = false
+  }
+  else if (hour > 12)
+  {
+    hour = hour - 12
+    night = true
+  }
+  const minutes = d.getMinutes();
+
+  let timestamp = dayWord + ' (' + month + '\/' + day + '\/' + year + ')' + ' ' + hour + ':' + minutes
+  if (night === true)
+  {
+    timestamp += 'PM'
+  }
+  else
+  {
+    timestamp += 'AM'
+  }
+  return timestamp
+}
+
+
 cli
   .delimiter(cli.chalk['yellow']('ftd~$'))
 
@@ -19,7 +56,7 @@ cli
     username = args.username
     const argsHost = args.host !== undefined ? args.host : 'localhost'
     const argsPort = args.port !== undefined ? args.port : 8080
-    const timestamp = new Date().toString()
+    const timestamp = generateTimeStamp()
     server = connect({ host: argsHost, port: argsPort }, () => {
       server.write(new Message({ username, command: 'connect', undefined, timestamp}).toJSON() + '\n')
       callback()
@@ -64,7 +101,7 @@ cli
   .action(function (input, callback) {
     const [ command, ...rest ] = input.split(' ')
     let contents = rest.join(' ')
-    const timestamp = new Date().toString()
+    const timestamp = generateTimeStamp()
     
     /*this.log('Command: ' + command)
     this.log('Rest: ' + rest)
