@@ -6,14 +6,11 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.cooksys.assessment.Main;
 import com.cooksys.assessment.model.Message;
 import com.cooksys.assessment.model.Users;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -84,7 +81,6 @@ public class ClientHandler implements Runnable {
 					writer.flush();
 				}	
 			}
-
 		} catch (IOException e) {
 			log.error("Something went wrong :/", e);
 		}
@@ -95,7 +91,7 @@ public class ClientHandler implements Runnable {
 		StringBuilder builder = new StringBuilder();
 		builder.append("\n  Commands:\n\n");
 		String padding = "                              ";
-		for (Map.Entry<String, String> entry : Main.commands.entrySet())
+		for (Map.Entry<String, String> entry : Server.commands.entrySet())
 		{
 			StringBuilder command = new StringBuilder();
 			command.append("    ");
