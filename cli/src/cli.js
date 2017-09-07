@@ -11,8 +11,7 @@ let previousCommand
 
 const generateTimeStamp = () => {
   const d = new Date()
-  const dString = d.toString().split(' ')
-  const dayWord = dString[0]
+  const dayWord = (d.toString().split(' '))[0]
   const month = d.getMonth() + 1
   const day = d.getDate()
   const year = d.getFullYear()
@@ -32,8 +31,9 @@ const generateTimeStamp = () => {
     night = true
   }
   const minutes = d.getMinutes();
+  const seconds = d.getSeconds();
 
-  let timestamp = dayWord + ' (' + month + '\/' + day + '\/' + year + ')' + ' ' + hour + ':' + minutes
+  let timestamp = dayWord + ' (' + month + '\/' + day + '\/' + year + ')' + ' ' + hour + ':' + minutes + ':' + seconds
   if (night === true)
   {
     timestamp += 'PM'
@@ -82,7 +82,7 @@ cli
       }
       else if (message.command === 'echo')
       {
-        this.log('`' + message.timestamp + ' <' + message.username + '> ' + '(echo): ' + message.contents + '`')
+        this.log(cli.chalk['magenta']('`' + message.timestamp + ' <' + message.username + '> ' + '(echo): ' + message.contents + '`'))
       }
       else if (message.command === 'broadcast')
       {
@@ -101,7 +101,7 @@ cli
       }
       else if (message.command === 'users')
       {
-        this.log(cli.chalk['magenta']('`' + message.timestamp + ': ' + 'currently connected users:`' + message.contents))
+        this.log('`' + message.timestamp + ': ' + 'currently connected users:`' + message.contents)
       }
       else if (message.command === 'help')
       {
