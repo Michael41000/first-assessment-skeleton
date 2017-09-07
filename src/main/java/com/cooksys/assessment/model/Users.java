@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -62,6 +64,35 @@ public class Users {
 			System.out.println("Something went wrong :/\n" + e);
 		}
 	}
+	
+	public synchronized void removeUserBySocket(Socket socket)
+	{
+		try {
+			if (users.containsValue(socket))
+			{
+				String removeUsername = null;
+				for (Map.Entry<String, Socket> entry : users.entrySet())
+				{
+					if (entry.getValue().equals(socket))
+					{
+						removeUsername = entry.getKey();
+					}
+				}
+				Message message = new Message();
+				message.setUsername(removeUsername);
+				message.setCommand("disconnect");
+				Calendar c = Calendar.getInstance();
+				SimpleDateFormat sdf = new SimpleDateFormat("E (M/d/yyyy) h:mm:ssa");
+				message.setTimestamp(sdf.format(c.getTime()));
+				broadcastMessage(message);
+				users.get(removeUsername).close();
+				users.remove(removeUsername);
+			}
+		} catch (IOException e) {
+			System.out.println("Something went wrong :/\n" + e);
+		}
+	}
+	
 	public synchronized boolean contains(String username)
 	{
 		return users.containsKey(username);

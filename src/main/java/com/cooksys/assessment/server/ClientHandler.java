@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -81,6 +82,9 @@ public class ClientHandler implements Runnable {
 					writer.flush();
 				}	
 			}
+		} catch(SocketException e) {
+			log.error("Client abruptly terminated connection");
+			users.removeUserBySocket(mySocket);
 		} catch (IOException e) {
 			log.error("Something went wrong :/", e);
 		}

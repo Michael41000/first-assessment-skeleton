@@ -19,29 +19,30 @@ const generateTimeStamp = () => {
   let night
   if (hour === 12)
   {
-    night = true
+    night = 'PM'
   }
   else if (hour < 12)
   {
-    night = false
+    night = 'AM'
   }
   else if (hour > 12)
   {
     hour = hour - 12
-    night = true
+    night = 'PM'
   }
-  const minutes = d.getMinutes();
-  const seconds = d.getSeconds();
+  let minutes = String(d.getMinutes());
+  let seconds = String(d.getSeconds());
+  if (minutes.length < 2)
+  {
+    minutes = 0 + minutes;
+  }
+  if (seconds.length < 2)
+  {
+    seconds = 0 + seconds
+  }
+  
 
-  let timestamp = dayWord + ' (' + month + '\/' + day + '\/' + year + ')' + ' ' + hour + ':' + minutes + ':' + seconds
-  if (night === true)
-  {
-    timestamp += 'PM'
-  }
-  else
-  {
-    timestamp += 'AM'
-  }
+  const timestamp = dayWord + ' (' + month + '\/' + day + '\/' + year + ')' + ' ' + hour + ':' + minutes + ':' + seconds + night
   return timestamp
 }
 
@@ -60,6 +61,21 @@ cli
     const timestamp = generateTimeStamp()
     server = connect({ host: argsHost, port: argsPort }, () => {
       server.write(new Message({ username, command: 'connect', undefined, timestamp}).toJSON() + '\n')
+      callback()
+    })
+
+    
+
+    server.on('error', (err) => {
+      if (err.code === 'ECONNREFUSED')
+      {
+        this.log('Server(\'' + argsHost + '\', \'' + argsPort + '\') is not currently active')
+      }
+      else if (err.code === 'ECONNRESET')
+      {
+        this.log('Server(\'' + argsHost + '\', \'' + argsPort + '\') has been shut down')
+      }
+      cli.exec('exit')
       callback()
     })
 
@@ -119,7 +135,7 @@ cli
     const timestamp = generateTimeStamp()
 
     const evaluateCommand = (command) => {
-      if (command === 'disconnect') {
+      if (command === 'disconnect' || command === 'exit') {
         previousCommand = null
         server.end(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (command === 'echo' || command === 'broadcast' || String(command).startsWith('@') === true) {
@@ -147,5 +163,4 @@ cli
     callback()
   })
 
-
-
+  
