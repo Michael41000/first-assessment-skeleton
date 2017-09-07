@@ -6,11 +6,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.cooksys.assessment.Main;
 import com.cooksys.assessment.model.Message;
 import com.cooksys.assessment.model.Users;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,6 +28,7 @@ public class ClientHandler implements Runnable {
 		super();
 		this.mySocket = mySocket;
 		this.users = users;
+		
 	}
 
 	public void run() {
@@ -70,14 +74,40 @@ public class ClientHandler implements Runnable {
 					log.info("user <{}> got list of users", message.getUsername());
 					users.getUsers(message);
 				}
-				
-						
-				
+				else if (message.getCommand().equals("help"))
+				{
+					log.info("user <{}> got list of commands", message.getUsername());
+					String help = printHelp();
+					message.setContents(help);
+					String helpResponse = mapper.writeValueAsString(message);
+					writer.write(helpResponse);
+					writer.flush();
+				}	
 			}
 
 		} catch (IOException e) {
 			log.error("Something went wrong :/", e);
 		}
+	}
+	
+	public String printHelp()
+	{
+		StringBuilder builder = new StringBuilder();
+		builder.append("\n  Commands:\n\n");
+		String padding = "                              ";
+		for (Map.Entry<String, String> entry : Main.commands.entrySet())
+		{
+			StringBuilder command = new StringBuilder();
+			command.append("    ");
+			command.append(entry.getKey());
+			command.append(padding);
+			builder.append(command.toString().substring(0, 30));
+			builder.append("\t");
+			builder.append(entry.getValue());
+			builder.append("\n");
+		}
+		String help = builder.toString();
+		return help;
 	}
 
 }

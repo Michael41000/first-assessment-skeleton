@@ -3,6 +3,8 @@ package com.cooksys.assessment.server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 import org.slf4j.Logger;
@@ -12,6 +14,7 @@ import com.cooksys.assessment.model.Users;
 
 public class Server implements Runnable {
 	private Logger log = LoggerFactory.getLogger(Server.class);
+	
 	
 	private int port;
 	private ExecutorService executor;

@@ -103,6 +103,10 @@ cli
       {
         this.log(cli.chalk['magenta']('`' + message.timestamp + ': ' + 'currently connected users:`' + message.contents))
       }
+      else if (message.command === 'help')
+      {
+        this.log(message.contents);
+      }
     })
 
     server.on('end', () => {
@@ -119,10 +123,9 @@ cli
       'echo <message>' : 'repeat message back',
       'users' : 'get list of users connected to server',
       'broadcast <message>' : 'send message to all users',
-      '@<username> <message>' : 'send a mess directly to a user',
+      '@<username> <message>' : 'send a message directly to a user',
       '<message>' : 'send message with previously used message command',
       'help' : 'print all commands'
-      
     }
 
     const evaluateCommand = (command) => {
@@ -141,13 +144,7 @@ cli
         previousCommand = command
         server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (command === 'help') {
-        this.log('\n  Commands:\n')
-        for (let prop in commands)
-        {
-          const padding = ' '.repeat(20)
-          this.log('    ' + (prop + padding).slice(0, 20) + '\t' + commands[prop])
-        }
-        this.log()
+        server.write(new Message({ username, command }).toJSON() + '\n')
       } else {
         if (previousCommand)
         {
