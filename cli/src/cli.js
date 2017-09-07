@@ -118,33 +118,15 @@ cli
     let contents = rest.join(' ')
     const timestamp = generateTimeStamp()
 
-    const commands = {
-      'disconnect' : 'disconnect from server',
-      'echo <message>' : 'repeat message back',
-      'users' : 'get list of users connected to server',
-      'broadcast <message>' : 'send message to all users',
-      '@<username> <message>' : 'send a message directly to a user',
-      '<message>' : 'send message with previously used message command',
-      'help' : 'print all commands'
-    }
-
     const evaluateCommand = (command) => {
       if (command === 'disconnect') {
         previousCommand = null
         server.end(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
-      } else if (command === 'echo') {
+      } else if (command === 'echo' || command === 'broadcast' || String(command).startsWith('@') === true) {
         previousCommand = command
         server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
-      } else if (command === 'users') {
+      } else if (command === 'users' || command === 'help') {
         server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
-      } else if (command === 'broadcast') {
-        previousCommand = command
-        server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
-      } else if (String(command).startsWith('@') === true) {
-        previousCommand = command
-        server.write(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
-      } else if (command === 'help') {
-        server.write(new Message({ username, command }).toJSON() + '\n')
       } else {
         if (previousCommand)
         {
@@ -161,8 +143,6 @@ cli
     }
 
     evaluateCommand(command);
-
-    
 
     callback()
   })
