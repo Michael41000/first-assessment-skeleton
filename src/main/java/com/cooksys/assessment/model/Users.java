@@ -22,41 +22,56 @@ public class Users {
 		users = new HashMap<String, Socket>();
 	}
 	
-	public boolean addUser(String username, Socket socket)
+	public synchronized void addUser(Message message, Socket socket)
 	{
-		if (users.containsKey(username))
-		{
-			return false;
+		try {
+			ObjectMapper mapper = new ObjectMapper();
+			PrintWriter writer = new PrintWriter(new OutputStreamWriter(socket.getOutputStream()));
+			// Nobody with duplicate username
+			if (!users.containsKey(message.getUsername()))	
+			{
+				users.put(message.getUsername(), socket);
+				broadcastMessage(message);
+			}
+			else
+			{
+				message.setContents("Denied due to duplicate username.");
+				message.setError(true);
+				String response = mapper.writeValueAsString(message);
+				writer.write(response);
+				writer.flush();
+				socket.close();
+			} 
 		}
-		else
-		{
-			users.put(username, socket);
-			return true;
+		catch (IOException e) {
+			System.out.println("Something went wrong :/\n" + e);
 		}
+		
 	}
 	
-	public boolean removeUser(String username)
+	public synchronized void removeUser(Message message)
 	{
-		if (users.containsKey(username))
-		{
-			users.remove(username);
-			return true;
-		}
-		else
-		{
-			return false;
+		try {
+			if (users.containsKey(message.getUsername()))
+			{
+				broadcastMessage(message);
+				users.get(message.getUsername()).close();
+				users.remove(message.getUsername());
+			}
+		} catch (IOException e) {
+			System.out.println("Something went wrong :/\n" + e);
 		}
 	}
-	public boolean contains(String username)
+	public synchronized boolean contains(String username)
 	{
 		return users.containsKey(username);
 	}
 	
-	public void broadcastMessage(Message message)
+	public synchronized void broadcastMessage(Message message)
 	{
+		ObjectMapper mapper = new ObjectMapper();
 		for (Map.Entry<String, Socket> entry : users.entrySet())
 		{
-			ObjectMapper mapper = new ObjectMapper();
 			if (!message.getUsername().equals(entry.getKey()))
 			{
 				PrintWriter writeToUser;
@@ -73,7 +88,7 @@ public class Users {
 		}
 	}
 
-	public void directMessage(Message message) {
+	public synchronized void directMessage(Message message) {
 		String username = message.getCommand().substring(1);;
 		
 		if (!users.containsKey(message.getCommand().substring(1)))
@@ -95,7 +110,7 @@ public class Users {
 		}
 	}
 
-	public void getUsers(Message message) {
+	public synchronized void getUsers(Message message) {
 		ObjectMapper mapper = new ObjectMapper();
 		PrintWriter writeToUser;
 		List<String> userListNames = new ArrayList<String>();

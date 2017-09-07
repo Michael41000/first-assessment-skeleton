@@ -40,30 +40,13 @@ public class ClientHandler implements Runnable {
 
 				if (message.getCommand().equals("connect"))
 				{
-					// Nobody with duplicate username
-					if (!users.contains(message.getUsername()))	
-					{
-						users.addUser(message.getUsername(), mySocket);
-						log.info("user <{}> connected", message.getUsername());
-						users.broadcastMessage(message);
-					}
-					else
-					{
-						log.info("user <{}> denied, duplicate username", message.getUsername());
-						message.setContents("Denied due to duplicate username.");
-						message.setError(true);
-						String response = mapper.writeValueAsString(message);
-						writer.write(response);
-						writer.flush();
-						this.mySocket.close();
-					}
+					log.info("user <{}> connected", message.getUsername());
+					users.addUser(message, mySocket);
 				}
 				else if (message.getCommand().equals("disconnect"))
 				{
 					log.info("user <{}> disconnected", message.getUsername());
-					users.broadcastMessage(message);
-					this.mySocket.close();
-					users.removeUser(message.getUsername());
+					users.removeUser(message);
 				}
 				else if (message.getCommand().equals("echo"))
 				{
@@ -84,7 +67,7 @@ public class ClientHandler implements Runnable {
 				}
 				else if (message.getCommand().equals("users"))
 				{
-					log.info("users <{}> got list of users", message.getUsername());
+					log.info("user <{}> got list of users", message.getUsername());
 					users.getUsers(message);
 				}
 				
