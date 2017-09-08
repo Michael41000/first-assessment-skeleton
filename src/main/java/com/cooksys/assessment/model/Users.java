@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class Users {
 
 	Map<String, Socket> users;
-	Object lock;
 	
 	public Users()
 	{
