@@ -135,7 +135,7 @@ cli
     const timestamp = generateTimeStamp()
 
     const evaluateCommand = (command) => {
-      if (command === 'disconnect' || command === 'exit') {
+      if (command === 'disconnect') {
         previousCommand = null
         server.end(new Message({ username, command, contents, timestamp }).toJSON() + '\n')
       } else if (command === 'echo' || command === 'broadcast' || String(command).startsWith('@') === true) {
